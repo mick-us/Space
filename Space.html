@@ -1,2 +1,75 @@
-<!Doctype html><!Doctype html>
-<!Doctype html><!Doctype html>
+<!Doctype html>
+<html>
+    <head>
+        <title>Space</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    </head>
+    <body>
+        <script type"text/javascript" src="dat.gui.min.js"></script>
+        <script type="module">
+            import * as THREE from 'https://unpkg.com/three@0.121.1/build/three.module.js';
+		    import { OrbitControls } from 'https://unpkg.com/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+            import { OBJLoader } from 'https://unpkg.com/three@0.121.1/examples/jsm/loaders/OBJLoader.js';
+            
+            //declaration des variables globales
+            var renderer, scene, camera;
+
+            init()
+            animate()
+
+            function init()
+            {
+                //render
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+		        renderer.setPixelRatio(window.devicePixelRatio);
+		        renderer.setSize(window.innerWidth, window.innerHeight);
+	            document.body.appendChild(renderer.domElement);
+                renderer.setClearColor(0x000000, 1.0);
+                renderer.clear();
+
+                //scene
+                scene = new THREE.Scene(); //creation de la scene
+                scene.background = new THREE.Color(0x010614);
+
+                //camera
+                camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,10000);
+                camera.lookAt(scene.position);
+                camera.position.set(0,400,500);
+                camera.rotation.set(0,0,0);
+
+                //lumiere
+                var whiteLight= new THREE.HemisphereLight(0xfff1bb,0xfff1bb,1);
+                whiteLight.position.set(0,400,0);
+                scene.add(whiteLight);
+
+                //controls
+                var controls=new OrbitControls(camera,renderer.domElement);
+
+                //Soleil
+                var sun=new THREE.Mesh(new THREE.SphereGeometry(300,300,300),new THREE.MeshPhongMaterial({color:0xffffff }));//soleil 
+                sun.position.set(0,0,0);
+                scene.add(sun);
+
+
+
+                //repere xyz
+                var axisHelper=new THREE.AxesHelper(500);
+                scene.add(axisHelper);
+            }
+
+            function animate()
+            {
+                requestAnimationFrame(animate);
+                renderer.render(scene,camera); //rendu avec la scene et la camera
+                controls.update();
+            }
+
+            function print(message) 
+            {
+                console.log(message);
+            }
+        </script>
+    </body>
+</html>
+
