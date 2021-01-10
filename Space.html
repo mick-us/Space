@@ -33,7 +33,7 @@
             var mercure, g_mercure;
             var jupiter, g_jupiter;
             var saturne, g_saturne;
-            var moon, g_moon;
+            var moon, pivot_moon;
 
             init()
             animate()
@@ -50,7 +50,7 @@
 
                 //scene
                 scene = new THREE.Scene(); 
-                scene.background = new THREE.Color(0x010614);
+                scene.background = new THREE.TextureLoader().load( "ciel-etoile.JPG" );
 
                 //camera
                 camera = new THREE.PerspectiveCamera(100,window.innerWidth/window.innerHeight,0.1,1500);
@@ -62,14 +62,15 @@
                 g_mercure=new THREE.Group();
                 scene.add(g_mercure);
 
-                g_jupiter=new THREE.Group();
-                scene.add(g_jupiter);
-
                 g_saturne=new THREE.Group();
                 scene.add(g_saturne);
 
-                g_moon=new THREE.Group();
-                scene.add(g_moon);
+                g_jupiter=new THREE.Group();
+                scene.add(g_jupiter);
+
+                //Pivot
+                pivot_moon=new THREE.Object3D();
+                g_jupiter.add(pivot_moon);
 
                 //lumiere
                 var Light= new THREE.HemisphereLight(0xfff1bb,0xfff1bb,1);
@@ -80,7 +81,8 @@
                 controls=new OrbitControls(camera,renderer.domElement);
 
                 //Soleil
-                var sun=new THREE.Mesh(new THREE.SphereGeometry(100,100,100),new THREE.MeshPhongMaterial({color:0xffffff }));
+                var texture_soleil= new THREE.TextureLoader().load( "texture_soleil.JPG" );
+                var sun=new THREE.Mesh(new THREE.SphereGeometry(100,100,100),new THREE.MeshBasicMaterial({map:texture_soleil }));
                 sun.position.set(0,0,0);
                 g_saturne.add(sun);
                 g_mercure.add(sun);
@@ -89,25 +91,25 @@
                 //Mercure
                 mercure=new THREE.Mesh(new THREE.SphereGeometry(30,30,30),new THREE.ShaderMaterial({
                     fragmentShader: document.getElementById( 'fragmentShader' ).textContent}));
-                mercure.position.set(-200,0,0);
+                mercure.position.set(200,0,0);
                 g_mercure.add(mercure);
 
-                //Jupiter
-                jupiter=new THREE.Mesh(new THREE.SphereGeometry(40,40,40),new THREE.ShaderMaterial({
-                    fragmentShader: document.getElementById( 'fragmentShader2' ).textContent}));
-                jupiter.position.set(-400,0,0);
-                g_jupiter.add(jupiter);
-
                 //Saturne
-                saturne=new THREE.Mesh(new THREE.SphereGeometry(35,35,35),new THREE.MeshPhongMaterial({color:0x6833FF}));
-                saturne.position.set(-600,0,0);
-                saturne.add(moon);
+                var texture_saturne = new THREE.TextureLoader().load( "texture_saturne.jpg" );
+                saturne=new THREE.Mesh(new THREE.SphereGeometry(40,40,40),new THREE.MeshBasicMaterial({map:texture_saturne}));
+                saturne.position.set(-400,0,0);
                 g_saturne.add(saturne);
+
+                //Jupiter
+                var texture_jupiter = new THREE.TextureLoader().load( "texture_jupiter.JPG" );
+                jupiter=new THREE.Mesh(new THREE.SphereGeometry(35,35,35),new THREE.MeshBasicMaterial({map:texture_jupiter}));
+                jupiter.position.set(600,0,0);
+                g_jupiter.add(jupiter);
                 
-                //Lune (devrait tourner autour de saturne)
+                //Lune 
                 moon=new THREE.Mesh(new THREE.SphereGeometry(15,15,15),new THREE.MeshPhongMaterial({color:0xFFFFFF}));
-                moon.position.set(-675,0,0);
-                g_moon.add(moon);
+                moon.position.set(-75,0,0);
+                pivot_moon.add(moon);
                 
                 //repere xyz
                 var axisHelper=new THREE.AxesHelper(500);
@@ -116,9 +118,13 @@
 
             function animate()
             {
-                g_moon.rotation.y+=0.001;
+                jupiter.rotation.y+=0.01;
+                saturne.rotation.y-=0.01;
+                mercure.rotation.y+=0.015;
+                pivot_moon.position.set(jupiter.position.x,jupiter.position.y,jupiter.position.z);
+                pivot_moon.rotation.y+=0.008;
                 g_saturne.rotation.y+=0.0005;
-                g_jupiter.rotation.y-=0.001;
+                g_jupiter.rotation.y+=0.001;
                 g_mercure.rotation.y+=0.005;
                 requestAnimationFrame(animate);
                 renderer.render(scene,camera); //rendu avec la scene et la camera
