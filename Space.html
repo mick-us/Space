@@ -48,6 +48,7 @@
             var moon, moon2, pivot_moon, pivot_moon2;
             var lm21, g_lm21;
             var my_uniforms;
+            var startPoint, endPoint;
 
             init()
             animate(new Date().getTime())
@@ -141,9 +142,22 @@
                 //Lm21
                 lm21=new THREE.Mesh();
 
-                //repere xyz
-                var axisHelper=new THREE.AxesHelper(500);
-                scene.add(axisHelper);
+                //Cercle orbit
+                startPoint=new THREE.Vector3(0,0,0);
+                endPoint=new THREE.Vector3(200,0,0);
+                var orbit1=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint),128),new THREE.LineBasicMaterial({color:0xCC0000}));
+                orbit1.rotation.x=Math.PI/2;
+                scene.add(orbit1);
+                
+                var endPoint2=new THREE.Vector3(-400,0,0);
+                var orbit2=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint2),128),new THREE.LineBasicMaterial({color:0xCC0000}));
+                orbit2.rotation.x=Math.PI/2;
+                scene.add(orbit2);
+
+                var endPoint3=new THREE.Vector3(600,0,0);
+                var orbit3=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint3),128),new THREE.LineBasicMaterial({color:0xCC0000}));
+                orbit3.rotation.x=Math.PI/2;
+                scene.add(orbit3);
             }
 
             function animate(t)
