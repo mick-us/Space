@@ -16,20 +16,20 @@
         <script type="x-shader/x-vertex" id="vertexShader">
             varying vec3 vUv;
             uniform float multiplicateur;
-            void main() 
+            void main()
             {
                 vUv=position;
                 vec3 my_position=position+normal*multiplicateur*5.;
                 gl_Position = projectionMatrix *  modelViewMatrix * vec4(my_position,1.0);
-              
+
             }
-          
+
           </script>
 
         <script type="x-shader/x-vertex" id="fragmentShader">
             varying vec3 vUv;
             uniform float time;
-            void main() 
+            void main()
             {
                 vec2 uv=gl_FragCoord.xy/vUv.xy;
                 vec3 col=0.5+0.5*cos(time+uv.y*0.000001+vec3(0,2,4));
@@ -39,9 +39,9 @@
 
         <script type="module">
             import * as THREE from 'https://unpkg.com/three@0.121.1/build/three.module.js';
-		    import { OrbitControls } from 'https://unpkg.com/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+		        import { OrbitControls } from 'https://unpkg.com/three@0.121.1/examples/jsm/controls/OrbitControls.js';
             import { OBJLoader } from 'https://unpkg.com/three@0.121.1/examples/jsm/loaders/OBJLoader.js';
-            
+
             //declaration des variables globales
             var renderer, scene, camera, controls;
             var mercure, g_mercure;
@@ -52,6 +52,8 @@
             var my_uniforms;
             var startPoint, endPoint;
             var anneau;
+            var options;
+            var pivot_cam;
 
             init()
             animate(new Date().getTime())
@@ -60,14 +62,14 @@
             {
                 //render
                 renderer = new THREE.WebGLRenderer({ antialias: true });
-		        renderer.setPixelRatio(window.devicePixelRatio);
-		        renderer.setSize(window.innerWidth, window.innerHeight);
-	            document.body.appendChild(renderer.domElement);
+		            renderer.setPixelRatio(window.devicePixelRatio);
+		            renderer.setSize(window.innerWidth, window.innerHeight);
+	              document.body.appendChild(renderer.domElement);
                 renderer.setClearColor(0x000000, 1.0);
                 renderer.clear();
 
                 //scene
-                scene = new THREE.Scene(); 
+                scene = new THREE.Scene();
                 scene.background = new THREE.TextureLoader().load( "ciel-etoile.JPG" );
 
                 //camera
@@ -107,6 +109,8 @@
                 pivot_moon2=new THREE.Object3D();
                 g_lm21.add(pivot_moon2);
 
+
+
                 //lumiere
                 var Light= new THREE.HemisphereLight(0xfff1bb,0xfff1bb,1);
                 Light.position.set(0,800,0);
@@ -123,13 +127,17 @@
                 g_mercure.add(sun);
                 g_jupiter.add(sun);
 
+                pivot_cam = new THREE.Object3D();
+                sun.add(pivot_cam);
+
+
                 //Mercure
                 mercure=new THREE.Mesh(new THREE.SphereGeometry(30,30,30),new THREE.ShaderMaterial({
                     uniforms:{
                         multiplicateur:{
                             type:'f',
                             value:0
-                        }, 
+                        },
                         time:{
                             value:new THREE.Vector2()
                         }
@@ -154,8 +162,8 @@
                 jupiter=new THREE.Mesh(new THREE.SphereGeometry(35,35,35),new THREE.MeshBasicMaterial({map:texture_jupiter}));
                 jupiter.position.set(600,0,0);
                 g_jupiter.add(jupiter);
-                
-                //Lune 
+
+                //Lune
                 var texture_lune = new THREE.TextureLoader().load( "texture_lune.JPG" );
                 moon=new THREE.Mesh(new THREE.SphereGeometry(15,15,15),new THREE.MeshBasicMaterial({map:texture_lune}));
                 moon.position.set(-100,0,0);
@@ -164,7 +172,7 @@
                 moon2=new THREE.Mesh(new THREE.SphereGeometry(15,15,15),new THREE.MeshBasicMaterial({map:texture_lune}));
                 moon2.position.set(75,0,0);
                 pivot_moon2.add(moon2);
-                
+
                 //Lm21
                 var texture_lm21 = new THREE.TextureLoader().load( "texture_lm21.JPG" );
                 lm21=new THREE.Mesh(new THREE.SphereGeometry(35,35,35),new THREE.MeshBasicMaterial({map:texture_lm21}));
@@ -177,7 +185,7 @@
                 var orbit1=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint),128),new THREE.LineBasicMaterial({color:0xCC0000}));
                 orbit1.rotation.x=Math.PI/2;
                 scene.add(orbit1);
-                
+
                 var endPoint2=new THREE.Vector3(-400,0,0);
                 var orbit2=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint2),128),new THREE.LineBasicMaterial({color:0xCC0000}));
                 orbit2.rotation.x=Math.PI/2;
@@ -192,6 +200,27 @@
                 var orbit4=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint4),128),new THREE.LineBasicMaterial({color:0xCC0000}));
                 orbit4.rotation.x=Math.PI/2;
                 scene.add(orbit4);
+
+                //Partie GUI
+                options = {
+                  rotcam: false,
+                  rotationOrbite: function() {
+                    camera.position.set(-900,0,0);
+                    pivot_cam.add(camera);
+                    this.rotcam = true;
+                  },
+                  stopRotationOrbite: function() {
+                    camera.lookAt(scene.position);
+                    camera.position.set(0,400,500);
+                    camera.rotation.set(0,0,0);
+
+                    this.rotcam = false;
+                  }
+                }
+                var gui = new dat.GUI();
+                gui.add(options, 'rotationOrbite');
+                gui.add(options, 'stopRotationOrbite');
+
             }
 
             function animate(t)
@@ -213,16 +242,23 @@
                 g_jupiter.rotation.y+=0.001;
                 g_mercure.rotation.y+=0.005;
                 g_lm21.rotation.y+=0.0015;
+                if(options.rotcam)
+                {
+                  camera.position.y = Math.sin(t/1000)*10;
+                  pivot_cam.rotation.y+=0.005;
+                }
                 requestAnimationFrame(animate);
                 renderer.render(scene,camera); //rendu avec la scene et la camera
                 controls.update();
             }
 
-            function print(message) 
+            function print(message)
             {
                 console.log(message);
             }
+
+
+
         </script>
     </body>
 </html>
-
