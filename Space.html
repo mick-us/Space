@@ -127,7 +127,7 @@
                 saturne.position.set(-400,0,0);
                 g_saturne.add(saturne);
 
-                anneau=new THREE.Mesh(new THREE.TorusGeometry(60,1,12,100),new THREE.MeshBasicMaterial());
+                anneau=new THREE.Mesh(new THREE.TorusGeometry(60,10,12,100),new THREE.MeshBasicMaterial({color:0xF0E6BC}));
                 anneau.rotation.x=Math.PI/2;
                 pivot_saturne.add(anneau);
 
@@ -148,7 +148,10 @@
                 pivot_moon2.add(moon2);
                 
                 //Lm21
-                lm21=new THREE.Mesh();
+                var texture_lm21 = new THREE.TextureLoader().load( "texture_lm21.JPG" );
+                lm21=new THREE.Mesh(new THREE.SphereGeometry(35,35,35),new THREE.MeshBasicMaterial({map:texture_lm21}));
+                lm21.position.set(-800,0,0);
+                g_lm21.add(lm21);
 
                 //Cercle orbit
                 startPoint=new THREE.Vector3(0,0,0);
@@ -166,12 +169,18 @@
                 var orbit3=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint3),128),new THREE.LineBasicMaterial({color:0xCC0000}));
                 orbit3.rotation.x=Math.PI/2;
                 scene.add(orbit3);
+
+                var endPoint4=new THREE.Vector3(-800,0,0);
+                var orbit4=new THREE.Line(new THREE.CircleGeometry(startPoint.distanceTo(endPoint4),128),new THREE.LineBasicMaterial({color:0xCC0000}));
+                orbit4.rotation.x=Math.PI/2;
+                scene.add(orbit4);
             }
 
             function animate(t)
             {
                 pivot_saturne.position.set(saturne.position.x,saturne.position.y,saturne.position.z)
                 mercure.material.uniforms.time.value=t*0.001;
+                lm21.rotation.y+=0.016;
                 moon.rotation.y+=0.001;
                 moon2.rotation.z+=0.001;
                 jupiter.rotation.y+=0.013;
@@ -184,6 +193,7 @@
                 g_saturne.rotation.y+=0.0005;
                 g_jupiter.rotation.y+=0.001;
                 g_mercure.rotation.y+=0.005;
+                g_lm21.rotation.y+=0.0015;
                 requestAnimationFrame(animate);
                 renderer.render(scene,camera); //rendu avec la scene et la camera
                 controls.update();
