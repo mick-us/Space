@@ -4,22 +4,29 @@
         <title>Space</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body{
+                overflow-x: hidden;
+                overflow-y: hidden;
+            }
+        </style>
     </head>
     <body>
         <script type"text/javascript" src="dat.gui.min.js"></script>
+        <script type="x-shader/x-vertex" id="vertexShader">
+            void main() 
+            {
+              gl_Position = projectionMatrix *  modelViewMatrix * vec4(position,1.0);
+              
+            }
+          
+          </script>
 
         <script type="x-shader/x-vertex" id="fragmentShader">
+            
             void main() 
             {
-                gl_FragColor = vec4(gl_FragCoord.x*0.0005,0.,0.,1.);
-            }
-        </script>
-
-        <script type="x-shader/x-vertex" id="fragmentShader2">
-            uniform vec3 color;
-            void main() 
-            {
-              gl_FragColor = vec4(gl_FragCoord.xy*0.001,0.5,1.0);
+                gl_FragColor = vec4(0.5, 1.,0.,1.);
             }
         </script>
 
@@ -33,7 +40,8 @@
             var mercure, g_mercure;
             var jupiter, g_jupiter;
             var saturne, g_saturne;
-            var moon, pivot_moon;
+            var moon, moon2, pivot_moon, pivot_moon2;
+            var lm21, g_lm21;
 
             init()
             animate()
@@ -68,9 +76,15 @@
                 g_jupiter=new THREE.Group();
                 scene.add(g_jupiter);
 
+                g_lm21=new THREE.Group();
+                scene.add(g_lm21);
+
                 //Pivot
                 pivot_moon=new THREE.Object3D();
                 g_jupiter.add(pivot_moon);
+
+                pivot_moon2=new THREE.Object3D();
+                g_jupiter.add(pivot_moon2);
 
                 //lumiere
                 var Light= new THREE.HemisphereLight(0xfff1bb,0xfff1bb,1);
@@ -90,6 +104,7 @@
 
                 //Mercure
                 mercure=new THREE.Mesh(new THREE.SphereGeometry(30,30,30),new THREE.ShaderMaterial({
+                    vertexShader: document.getElementById( 'vertexShader' ).textContent,
                     fragmentShader: document.getElementById( 'fragmentShader' ).textContent}));
                 mercure.position.set(200,0,0);
                 g_mercure.add(mercure);
@@ -107,10 +122,18 @@
                 g_jupiter.add(jupiter);
                 
                 //Lune 
-                moon=new THREE.Mesh(new THREE.SphereGeometry(15,15,15),new THREE.MeshPhongMaterial({color:0xFFFFFF}));
-                moon.position.set(-75,0,0);
+                var texture_lune = new THREE.TextureLoader().load( "texture_lune.JPG" );
+                moon=new THREE.Mesh(new THREE.SphereGeometry(15,15,15),new THREE.MeshBasicMaterial({map:texture_lune}));
+                moon.position.set(-100,0,0);
                 pivot_moon.add(moon);
+
+                moon2=new THREE.Mesh(new THREE.SphereGeometry(15,15,15),new THREE.MeshBasicMaterial({map:texture_lune}));
+                moon2.position.set(75,0,0);
+                pivot_moon2.add(moon2);
                 
+                //Lm21
+                lm21=new THREE.Mesh();
+
                 //repere xyz
                 var axisHelper=new THREE.AxesHelper(500);
                 scene.add(axisHelper);
@@ -118,11 +141,15 @@
 
             function animate()
             {
-                jupiter.rotation.y+=0.01;
+                moon.rotation.y+=0.001;
+                moon2.rotation.z+=0.001;
+                jupiter.rotation.y+=0.013;
                 saturne.rotation.y-=0.01;
                 mercure.rotation.y+=0.015;
                 pivot_moon.position.set(jupiter.position.x,jupiter.position.y,jupiter.position.z);
-                pivot_moon.rotation.y+=0.008;
+                pivot_moon2.position.set(jupiter.position.x,jupiter.position.y,jupiter.position.z);
+                pivot_moon.rotation.z+=0.008;
+                pivot_moon2.rotation.y+=0.008;
                 g_saturne.rotation.y+=0.0005;
                 g_jupiter.rotation.y+=0.001;
                 g_mercure.rotation.y+=0.005;
