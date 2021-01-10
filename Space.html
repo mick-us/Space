@@ -95,7 +95,7 @@
                 g_saturne.add(pivot_saturne);
 
                 pivot_moon2=new THREE.Object3D();
-                g_jupiter.add(pivot_moon2);
+                g_lm21.add(pivot_moon2);
 
                 //lumiere
                 var Light= new THREE.HemisphereLight(0xfff1bb,0xfff1bb,1);
@@ -187,7 +187,7 @@
                 saturne.rotation.y-=0.01;
                 mercure.rotation.y+=0.015;
                 pivot_moon.position.set(jupiter.position.x,jupiter.position.y,jupiter.position.z);
-                pivot_moon2.position.set(jupiter.position.x,jupiter.position.y,jupiter.position.z);
+                pivot_moon2.position.set(lm21.position.x,lm21.position.y,lm21.position.z);
                 pivot_moon.rotation.z+=0.008;
                 pivot_moon2.rotation.y+=0.008;
                 g_saturne.rotation.y+=0.0005;
