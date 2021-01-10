@@ -44,11 +44,12 @@
             var renderer, scene, camera, controls;
             var mercure, g_mercure;
             var jupiter, g_jupiter;
-            var saturne, g_saturne;
+            var saturne, g_saturne, pivot_saturne;
             var moon, moon2, pivot_moon, pivot_moon2;
             var lm21, g_lm21;
             var my_uniforms;
             var startPoint, endPoint;
+            var anneau;
 
             init()
             animate(new Date().getTime())
@@ -90,6 +91,9 @@
                 pivot_moon=new THREE.Object3D();
                 g_jupiter.add(pivot_moon);
 
+                pivot_saturne=new THREE.Object3D();
+                g_saturne.add(pivot_saturne);
+
                 pivot_moon2=new THREE.Object3D();
                 g_jupiter.add(pivot_moon2);
 
@@ -122,6 +126,10 @@
                 saturne=new THREE.Mesh(new THREE.SphereGeometry(40,40,40),new THREE.MeshBasicMaterial({map:texture_saturne}));
                 saturne.position.set(-400,0,0);
                 g_saturne.add(saturne);
+
+                anneau=new THREE.Mesh(new THREE.TorusGeometry(60,1,12,100),new THREE.MeshBasicMaterial());
+                anneau.rotation.x=Math.PI/2;
+                pivot_saturne.add(anneau);
 
                 //Jupiter
                 var texture_jupiter = new THREE.TextureLoader().load( "texture_jupiter.JPG" );
@@ -162,6 +170,7 @@
 
             function animate(t)
             {
+                pivot_saturne.position.set(saturne.position.x,saturne.position.y,saturne.position.z)
                 mercure.material.uniforms.time.value=t*0.001;
                 moon.rotation.y+=0.001;
                 moon2.rotation.z+=0.001;
